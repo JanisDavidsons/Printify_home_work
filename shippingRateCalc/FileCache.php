@@ -8,31 +8,41 @@ use App\interfaces\RecordSearchInterface;
 class FileCache implements FileCacheInterface
 {
     private RecordSearchInterface $recordSearch;
-    private string $cacheFilePath;
+    private string $cacheFile;
 
     public function __construct(RecordSearchInterface $recordSearch, string $cacheFilePath)
     {
         $this->recordSearch = $recordSearch;
-        $this->cacheFilePath = $cacheFilePath;
+        $this->cacheFile = $cacheFilePath;
     }
 
     public function set(string $key, $value, int $duration): string
     {
-        $file = fopen($this->cacheFilePath, 'w');
+        $currentCache = null;
+        $jsonData = file_get_contents($this->cacheFile);
+        if (!$jsonData) {
+            $file = fopen($this->cacheFile, 'w');
+            fwrite($file, json_encode([$key => $value]), JSON_UNESCAPED_UNICODE);
+        } else {
+            $cache = json_decode(file_get_contents($this->cacheFile), true);
+            $cache[$key] = $value;
 
-        fwrite($file, json_encode([$key => $value], JSON_UNESCAPED_UNICODE));
-        touch($this->cacheFilePath, time() + $duration * 60);
-        fclose($file);
-        return json_encode([$key => $value]);
+            $currentCache = json_encode($cache);
+            $file = fopen($this->cacheFile, 'w');
+
+            fwrite($file, $currentCache, JSON_UNESCAPED_UNICODE);
+            fclose($file);
+        }
+        touch($this->cacheFile, time() + $duration * 60);
+        return $currentCache;
     }
 
     public function get(string $key)
     {
-        $jsonData = file_get_contents($this->cacheFilePath);
+        $jsonData = file_get_contents($this->cacheFile);
         $result = null;
-
         if ($jsonData) {
-            if (filemtime($this->cacheFilePath) > time()) {
+            if (filemtime($this->cacheFile) > time()) {
                 $data = json_decode($jsonData, true);
                 $result = $this->recordSearch->findRecord($key, $data);
             }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App;
 
 use App\interfaces\FileCacheInterface;
@@ -28,12 +29,14 @@ class Connection
         return json_decode($response->getBody(), true);
     }
 
-    public function saveCache(string $key,int $duration)
+    public function saveCache(int $duration): void
     {
-        $this->cache->set($key, $this->getPostData(), $duration);
+        foreach ($this->getPostData() as $key => $element) {
+            $this->cache->set($key, $element, $duration);
+        }
     }
 
-    public function getCache(string $recordKey):?string
+    public function getCache(string $recordKey): ?string
     {
         return $this->cache->get($recordKey);
     }
