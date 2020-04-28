@@ -1,9 +1,12 @@
 <?php
 
-namespace App;
+namespace App\core;
 
 use App\interfaces\FileCacheInterface;
 use GuzzleHttp\Client;
+
+/**@todo Is this class ok to have? I made it to  inject FileCacheInterface somewhere..
+ */
 
 class Connection
 {
@@ -29,11 +32,14 @@ class Connection
         return json_decode($response->getBody(), true);
     }
 
-    public function saveCache(int $duration): void
+    public function saveCache(int $duration): string
     {
+        $cacheResult = null;
         foreach ($this->getPostData() as $key => $element) {
-            $this->cache->set($key, $element, $duration);
+            global $cacheResult;
+            $cacheResult = $this->cache->set($key, $element, $duration);
         }
+        return $cacheResult;
     }
 
     public function getCache(string $recordKey): ?string

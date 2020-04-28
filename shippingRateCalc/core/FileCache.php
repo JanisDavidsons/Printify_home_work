@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\core;
 
 use App\interfaces\FileCacheInterface;
 use App\interfaces\RecordSearchInterface;

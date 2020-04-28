@@ -12,5 +12,5 @@ return [
     ], 'items' => [[
         'quantity' => 2,
         "variant_id" => 7679
-    ]]]
+    ]]],
 ];
