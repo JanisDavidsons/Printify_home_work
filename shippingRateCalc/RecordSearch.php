@@ -6,19 +6,36 @@ use App\interfaces\RecordSearchInterface;
 
 class RecordSearch implements RecordSearchInterface
 {
-    private static ? string $result = null;
+    private ? string $result = null;
+    private ? array $modified = null;
 
-    public static function findRecord(string $searchFor, array $searchIn):string
+    public function findRecord(string $searchFor, array $searchIn): ?string
     {
         foreach ($searchIn as $key => $value) {
             // converting $key to string to prevent key type conversion
             if ((string)$key == $searchFor) {
-                self::$result = json_encode($value);
+                $this->result = json_encode($value);
             }
             if (is_array($value)) {
-                self::findRecord($searchFor, $value);
+                $this->findRecord($searchFor, $value);
             }
         }
-        return self::$result;
+        return $this->result;
+    }
+
+
+    function findReplace(string $searchFor, string $replaceWith, $array): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $this->findReplace($searchFor, $replaceWith, $value);
+            } else {
+                if ($key == $searchFor) {
+                    $array[$key] = $replaceWith;
+                    break;
+                }
+            }
+        }
+        return $array;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\interfaces;
 
-interface ShippingRateInterface
+interface FileCacheInterface
 {
     /**
      * Store a mixed type value in cache for a certain amount of seconds.

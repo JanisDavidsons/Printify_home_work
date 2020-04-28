@@ -3,21 +3,16 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = require 'shippingRateCalc/config/configuration.php';
 
 use App\RecordSearch;
-use App\ShippingRates;
+use App\FileCache;
+use App\Connection;
 use GuzzleHttp\Client;
 
 $client = new Client();
 $recordSearch = new RecordSearch();
-$calculator = new ShippingRates($recordSearch, $config['catchPath']);
+$cache = new FileCache($recordSearch, $config['catchPath']);
+$connection = new Connection($cache,$client,$config);
 
-$clientHandler = $client->getConfig('handler');
+$connection->saveCache('shippingRates',5);
 
-$response = $client->request(
-    'POST',
-    'https://api.printful.com/shipping/rates',
-    ['auth' => [$config['apiUserName'], $config['apiKey']], 'body' => json_encode($config['postBody'])]);
-
-$rawData = json_decode($response->getBody(), true);
-
-$calculator->set('shippingRates', $rawData, 5);
-echo $calculator->get('maxDeliveryDays');
+echo '<pre>';
+echo $connection->getCache('shippingRates');
