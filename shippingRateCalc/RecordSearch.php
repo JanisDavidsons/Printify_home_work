@@ -22,20 +22,4 @@ class RecordSearch implements RecordSearchInterface
         }
         return $this->result;
     }
-
-
-    function findReplace(string $searchFor, string $replaceWith, $array): array
-    {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $this->findReplace($searchFor, $replaceWith, $value);
-            } else {
-                if ($key == $searchFor) {
-                    $array[$key] = $replaceWith;
-                    break;
-                }
-            }
-        }
-        return $array;
-    }
 }

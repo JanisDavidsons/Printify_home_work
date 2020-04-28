@@ -16,7 +16,7 @@ class FileCache implements FileCacheInterface
         $this->cacheFilePath = $cacheFilePath;
     }
 
-    public function set(string $key, $value, int $duration):string
+    public function set(string $key, $value, int $duration): string
     {
         $file = fopen($this->cacheFilePath, 'w');
 
