@@ -1,36 +1,23 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
+$config = require 'shippingRateCalc/config/configuration.php';
 
-use App\ShippingRateCalc;
+use App\RecordSearch;
+use App\ShippingRates;
 use GuzzleHttp\Client;
-use GuzzleHttp\Middleware;
 
 $client = new Client();
-$calculator = new ShippingRateCalc();
+$recordSearch = new RecordSearch();
+$calculator = new ShippingRates($recordSearch, $config['catchPath']);
 
 $clientHandler = $client->getConfig('handler');
-$tapMiddleware = Middleware::tap(function ($request) {
-    $request->getBody();
-});
 
 $response = $client->request(
     'POST',
     'https://api.printful.com/shipping/rates',
-    ['auth' => ['', '77qn9aax-qrrm-idki:lnh0-fm2nhmp0yca7'],
-        'body' => json_encode(
-            ['recipient' => [
-                'address1' => '11025 Westlake Dr',
-                'city' => 'Charlotte',
-                'country_code' => 'US',
-                "state_code" => "NC",
-                "zip" => 28273
-            ], 'items' => [[
-                'quantity' => 2,
-                "variant_id" => 7679
-            ]]]),
-        'handler' => $tapMiddleware($clientHandler)]);
+    ['auth' => [$config['apiUserName'], $config['apiKey']], 'body' => json_encode($config['postBody'])]);
 
 $rawData = json_decode($response->getBody(), true);
 
-//$calculator->set('shippingRates', $rawData, 5);
+$calculator->set('shippingRates', $rawData, 5);
 echo $calculator->get('maxDeliveryDays');

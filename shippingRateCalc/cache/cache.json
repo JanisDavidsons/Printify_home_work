@@ -1,16 +1,1 @@
-{
-  "shippingRates": {
-    "code": 200,
-    "result": [
-      {
-        "id": "STANDARD",
-        "name": "Flat Rate (3-4 business days after fulfillment)",
-        "rate": "5.24",
-        "currency": "USD",
-        "minDeliveryDays": 3,
-        "maxDeliveryDays": 4
-      }
-    ],
-    "extra": []
-  }
-}
+{"shippingRates":{"code":200,"result":[{"id":"STANDARD","name":"Flat Rate (3-4 business days after fulfillment)","rate":"5.24","currency":"USD","minDeliveryDays":3,"maxDeliveryDays":4}],"extra":[]}}

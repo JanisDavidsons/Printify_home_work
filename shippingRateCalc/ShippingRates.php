@@ -2,12 +2,19 @@
 
 namespace App;
 
+use App\interfaces\RecordSearchInterface;
 use App\interfaces\ShippingRateInterface;
 
-
-class ShippingRateCalc implements ShippingRateInterface
+class ShippingRates implements ShippingRateInterface
 {
-    private const CACHE_FILE = './shippingRateCalc/cache/cache.json';
+    private RecordSearchInterface $recordSearch;
+    private string $cacheFilePath;
+
+    public function __construct(RecordSearchInterface $recordSearch,string $cacheFilePath)
+    {
+        $this->recordSearch = $recordSearch;
+        $this->cacheFilePath = $cacheFilePath;
+    }
 
     public function set(string $key, $value, int $duration)
     {
@@ -20,26 +27,23 @@ class ShippingRateCalc implements ShippingRateInterface
 //        var_dump($shippingRates);
         //$data[$key]=$value;
 
-        $file = fopen(self::CACHE_FILE, 'w');
+        $file = fopen($this->cacheFilePath, 'w');
 
         fwrite($file, json_encode([$key => $value], JSON_UNESCAPED_UNICODE));
-        touch(self::CACHE_FILE, time() + $duration * 60);
+        touch($this->cacheFilePath, time() + $duration * 60);
         fclose($file);
         return json_encode([$key => $value]);
     }
 
     public function get(string $key)
     {
-        $jsonData = file_get_contents(self::CACHE_FILE);
+        $jsonData = file_get_contents($this->cacheFilePath);
         $result = null;
 
         if ($jsonData) {
-            if (filemtime(self::CACHE_FILE) > time()) {
+            if (filemtime($this->cacheFilePath) > time()) {
                 $data = json_decode($jsonData, true);
                 $result = RecordSearch::findRecord($key,$data);
-//                var_dump($data);
-//                    $result = json_encode($data);
-//                }
             }
             return $result;
         }
